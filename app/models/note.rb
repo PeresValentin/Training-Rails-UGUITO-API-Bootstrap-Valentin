@@ -11,8 +11,6 @@
 #  updated_at :datetime         not null
 #
 class Note < ApplicationRecord
-  validates :title, :content, :note_type, :user_id, presence: true
-
   belongs_to :user
   has_one :utility, through: :user
   enum note_type: { review: 0, critique: 1 }

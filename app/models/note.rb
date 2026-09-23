@@ -15,4 +15,7 @@ class Note < ApplicationRecord
   has_one :utility, through: :user
   enum note_type: { review: 0, critique: 1 }
   validates :title, :content, :note_type, presence: true
+  def word_count
+    content.to_s.split.size
+  end
 end

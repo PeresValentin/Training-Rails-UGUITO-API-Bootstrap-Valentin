@@ -147,7 +147,7 @@ RSpec.describe Note, type: :model do
         it 'adds an error to content' do
           note.valid?
 
-          expect(note.errors[:content]).to be_present
+          expect(note.errors.added?(:content, :review_too_long, max_words: 50)).to be(true)
         end
       end
     end
@@ -173,7 +173,7 @@ RSpec.describe Note, type: :model do
         it 'adds an error to content' do
           note.valid?
 
-          expect(note.errors[:content]).to be_present
+          expect(note.errors.added?(:content, :review_too_long, max_words: 60)).to be(true)
         end
       end
     end
@@ -198,6 +198,6 @@ RSpec.describe Note, type: :model do
   end
 
   it 'has a valid factory' do
-    expect(subject).to be_valid
+    expect(note).to be_valid
   end
 end

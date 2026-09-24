@@ -20,6 +20,32 @@ RSpec.describe Note, type: :model do
   expect { build(:note, note_type: :invalid) }.to raise_error(ArgumentError)
   end
 
+  describe '#word_count' do
+  context 'when content has one word' do
+    let(:note) { build(:note, content: 'hola') }
+
+    it 'returns 1' do
+      expect(note.word_count).to eq(1)
+    end
+  end
+
+  context 'when content has multiple words' do
+    let(:note) { build(:note, content: 'una nota corta') }
+
+    it 'returns 3' do
+      expect(note.word_count).to eq(3)
+    end
+  end
+
+  context 'when content has extra spaces' do
+    let(:note) { build(:note, content: '  una   nota  ') }
+
+    it 'returns 2' do
+      expect(note.word_count).to eq(2)
+    end
+  end
+  end
+
   it 'has a valid factory' do
     expect(subject).to be_valid
   end

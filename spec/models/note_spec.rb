@@ -13,9 +13,10 @@ RSpec.describe Note, type: :model do
   it { is_expected.to have_one(:utility).through(:user) }
 
   it do
-    is_expected.to define_enum_for(:note_type)
+    expect(note).to define_enum_for(:note_type)
       .with_values(review: 0, critique: 1)
   end
+
   it 'rejects an invalid note type' do
     expect { build(:note, note_type: :invalid) }.to raise_error(ArgumentError)
   end

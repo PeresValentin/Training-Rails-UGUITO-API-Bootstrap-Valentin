@@ -114,6 +114,88 @@ RSpec.describe Note, type: :model do
     end
   end
 
+  describe 'review content limit' do
+    let(:user) { create(:user, utility: utility) }
+    let(:note) do
+      build(
+        :note,
+        user: user,
+        note_type: :review,
+        content: ('word ' * content_words).strip
+      )
+    end
+
+    context 'when utility is North' do
+      let(:utility) { create(:north_utility) }
+
+      context 'when content is at the limit' do
+        let(:content_words) { 50 }
+
+        it 'is valid' do
+          expect(note).to be_valid
+        end
+      end
+
+      context 'when content exceeds the limit' do
+        let(:content_words) { 51 }
+
+        it 'is invalid' do
+          expect(note).not_to be_valid
+        end
+
+        it 'adds an error to content' do
+          note.valid?
+
+          expect(note.errors[:content]).to be_present
+        end
+      end
+    end
+
+    context 'when utility is South' do
+      let(:utility) { create(:south_utility) }
+
+      context 'when content is at the limit' do
+        let(:content_words) { 60 }
+
+        it 'is valid' do
+          expect(note).to be_valid
+        end
+      end
+
+      context 'when content exceeds the limit' do
+        let(:content_words) { 61 }
+
+        it 'is invalid' do
+          expect(note).not_to be_valid
+        end
+
+        it 'adds an error to content' do
+          note.valid?
+
+          expect(note.errors[:content]).to be_present
+        end
+      end
+    end
+  end
+
+  describe 'critique content limit' do
+    let(:utility) { create(:north_utility) }
+    let(:user) { create(:user, utility: utility) }
+
+    let(:note) do
+      build(
+        :note,
+        user: user,
+        note_type: :critique,
+        content: ('word ' * 101).strip
+      )
+    end
+
+    it 'is valid' do
+      expect(note).to be_valid
+    end
+  end
+
   it 'has a valid factory' do
     expect(subject).to be_valid
   end

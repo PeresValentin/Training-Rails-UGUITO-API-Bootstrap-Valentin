@@ -13,37 +13,105 @@ RSpec.describe Note, type: :model do
   it { is_expected.to have_one(:utility).through(:user) }
 
   it do
-  is_expected.to define_enum_for(:note_type)
-    .with_values(review: 0, critique: 1)
+    is_expected.to define_enum_for(:note_type)
+      .with_values(review: 0, critique: 1)
   end
   it 'rejects an invalid note type' do
-  expect { build(:note, note_type: :invalid) }.to raise_error(ArgumentError)
+    expect { build(:note, note_type: :invalid) }.to raise_error(ArgumentError)
   end
 
   describe '#word_count' do
-  context 'when content has one word' do
-    let(:note) { build(:note, content: 'hola') }
+    context 'when content has one word' do
+      let(:note) { build(:note, content: 'hola') }
 
-    it 'returns 1' do
-      expect(note.word_count).to eq(1)
+      it 'returns 1' do
+        expect(note.word_count).to eq(1)
+      end
+    end
+
+    context 'when content has multiple words' do
+      let(:note) { build(:note, content: 'una nota corta') }
+
+      it 'returns 3' do
+        expect(note.word_count).to eq(3)
+      end
+    end
+
+    context 'when content has extra spaces' do
+      let(:note) { build(:note, content: '  una   nota  ') }
+
+      it 'returns 2' do
+        expect(note.word_count).to eq(2)
+      end
     end
   end
 
-  context 'when content has multiple words' do
-    let(:note) { build(:note, content: 'una nota corta') }
-
-    it 'returns 3' do
-      expect(note.word_count).to eq(3)
+  describe '#content_length' do
+    let(:user) { create(:user, utility: utility) }
+    let(:note) do
+      build(
+        :note,
+        user: user,
+        note_type: :critique,
+        content: ('word ' * content_words).strip
+      )
     end
-  end
 
-  context 'when content has extra spaces' do
-    let(:note) { build(:note, content: '  una   nota  ') }
+    context 'when utility is North' do
+      let(:utility) { create(:north_utility) }
 
-    it 'returns 2' do
-      expect(note.word_count).to eq(2)
+      context 'when content is short' do
+        let(:content_words) { 50 }
+
+        it 'returns short' do
+          expect(note.content_length).to eq('short')
+        end
+      end
+
+      context 'when content is medium' do
+        let(:content_words) { 100 }
+
+        it 'returns medium' do
+          expect(note.content_length).to eq('medium')
+        end
+      end
+
+      context 'when content is long' do
+        let(:content_words) { 101 }
+
+        it 'returns long' do
+          expect(note.content_length).to eq('long')
+        end
+      end
     end
-  end
+
+    context 'when utility is South' do
+      let(:utility) { create(:south_utility) }
+
+      context 'when content is short' do
+        let(:content_words) { 60 }
+
+        it 'returns short' do
+          expect(note.content_length).to eq('short')
+        end
+      end
+
+      context 'when content is medium' do
+        let(:content_words) { 120 }
+
+        it 'returns medium' do
+          expect(note.content_length).to eq('medium')
+        end
+      end
+
+      context 'when content is long' do
+        let(:content_words) { 121 }
+
+        it 'returns long' do
+          expect(note.content_length).to eq('long')
+        end
+      end
+    end
   end
 
   it 'has a valid factory' do

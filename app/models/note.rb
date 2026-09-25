@@ -15,29 +15,23 @@ class Note < ApplicationRecord
   has_one :utility, through: :user
   enum note_type: { review: 0, critique: 1 }
   validates :title, :content, :note_type, presence: true
-  validate :review_content_within_limit
+  validate :review_content_must_be_short
+
   def word_count
     content.to_s.split.size
   end
 
   def content_length
-    limits = utility.note_content_limits
-
-    return 'short' if word_count <= limits[:short]
-    return 'medium' if word_count <= limits[:medium]
-
-    'long'
+    utility.note_content_length(self)
   end
 
   private
 
-  def review_content_within_limit
+  def review_content_must_be_short
     return unless review?
-    return if user.blank? || content.blank?
+    return if utility.blank?
+    return if utility.short_note?(self)
 
-    max_words = utility.note_content_limits[:short]
-    return if word_count <= max_words
-
-    errors.add(:content, :review_too_long, max_words: max_words)
+    errors.add(:content, :review_too_long)
   end
 end

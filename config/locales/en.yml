@@ -38,4 +38,4 @@ en:
         note:
           attributes:
             content:
-              review_too_long: "cannot exceed %{max_words} words for a review"
+              review_too_long: "is too long for a review"

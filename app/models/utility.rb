@@ -73,9 +73,6 @@ class Utility < ApplicationRecord
     self.class.name.underscore.split('_').first
   end
 
-  # Classifies the note's content as 'short', 'medium' or 'long'.
-  # Subclasses only define when a note is short or medium; #medium_note? is checked
-  # only when the note is not short.
   def note_content_length(note)
     return 'short' if short_note?(note)
     return 'medium' if medium_note?(note)
@@ -83,7 +80,6 @@ class Utility < ApplicationRecord
     'long'
   end
 
-  # @abstract Subclass is expected to implement #short_note?
   def short_note?(_note)
     raise NotImplementedError, "#{self.class.name} must implement #short_note?"
   end
@@ -94,7 +90,6 @@ class Utility < ApplicationRecord
     type.chomp('Utility')
   end
 
-  # @abstract Subclass is expected to implement #medium_note? as a private method
   def medium_note?(_note)
     raise NotImplementedError, "#{self.class.name} must implement #medium_note?"
   end

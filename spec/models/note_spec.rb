@@ -53,7 +53,6 @@ RSpec.describe Note, type: :model do
       build(
         :note,
         user: user,
-        note_type: :critique,
         content: ('word ' * content_words).strip
       )
     end

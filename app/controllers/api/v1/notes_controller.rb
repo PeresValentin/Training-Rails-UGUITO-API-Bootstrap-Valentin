@@ -8,7 +8,12 @@ module Api
       private
 
       def notes
-        Note.all
+        def notes
+  Note.with_type(params[:type])
+      .ordered_by_creation(params[:order])
+      .page(params[:page])
+      .per(params[:page_size])
+end
       end
     end
   end

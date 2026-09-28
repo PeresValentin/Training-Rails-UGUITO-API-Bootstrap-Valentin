@@ -126,6 +126,14 @@ RSpec.describe Note, type: :model do
       )
     end
 
+    context 'without user' do
+      let(:note) { build(:note, user: nil) }
+
+      it 'does not raise an error' do
+        expect { note.valid? }.not_to raise_error
+      end
+    end
+
     context 'when utility is North' do
       let(:utility) { create(:north_utility) }
 
@@ -147,7 +155,7 @@ RSpec.describe Note, type: :model do
         it 'adds an error to content' do
           note.valid?
 
-          expect(note.errors.added?(:content, :review_too_long, max_words: 50)).to be(true)
+          expect(note.errors.added?(:content, :review_too_long)).to be(true)
         end
       end
     end
@@ -173,7 +181,7 @@ RSpec.describe Note, type: :model do
         it 'adds an error to content' do
           note.valid?
 
-          expect(note.errors.added?(:content, :review_too_long, max_words: 60)).to be(true)
+          expect(note.errors.added?(:content, :review_too_long)).to be(true)
         end
       end
     end

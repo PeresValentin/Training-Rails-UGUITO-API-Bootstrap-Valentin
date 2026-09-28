@@ -31,3 +31,11 @@
 
 es:
   hello: "Hola Mundo!"
+
+  activerecord:
+    errors:
+      models:
+        note:
+          attributes:
+            content:
+              review_too_long: "es demasiado largo para una review"

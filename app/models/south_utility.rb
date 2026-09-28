@@ -1,9 +1,9 @@
 class SouthUtility < Utility
+  private
+
   def short_note?(note)
     note.word_count <= 60
   end
-
-  private
 
   def medium_note?(note)
     note.word_count <= 120

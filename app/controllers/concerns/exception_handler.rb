@@ -45,4 +45,9 @@ module ExceptionHandler
   def render_utility_unavailable
     render_error(:utility_unavailable, status: :internal_server_error)
   end
+
+  def render_error(identifier, message: nil, meta: nil, status: :bad_request)
+    error = ErrorResponseBuilder.new(status).add_error(identifier, message: message, meta: meta)
+    render json: error, status: status
+  end
 end

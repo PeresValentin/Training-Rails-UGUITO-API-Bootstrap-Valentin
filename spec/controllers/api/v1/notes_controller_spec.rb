@@ -127,5 +127,57 @@ describe Api::V1::NotesController, type: :controller do
         expect(response).to have_http_status(:ok)
       end
     end
+
+    context 'when type param is invalid' do
+      before { get :index, params: { type: 'banana' } }
+
+      it 'responds with 400 status' do
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it 'responds with an invalid type error' do
+        expect(response_body['error']).to eq('Invalid note type')
+      end
+    end
+
+    context 'when order param is invalid' do
+      before { get :index, params: { order: 'banana' } }
+
+      it 'responds with 400 status' do
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it 'responds with an invalid order error' do
+        expect(response_body['error']).to eq('Invalid order')
+      end
+    end
+  end
+
+  describe 'GET #show' do
+    let!(:note) { create(:note) }
+
+    context 'when the note exists' do
+      let(:expected) do
+        ShowNoteSerializer.new(note).to_json
+      end
+
+      before { get :show, params: { id: note.id } }
+
+      it 'responds with the expected note json' do
+        expect(response_body.to_json).to eq(expected)
+      end
+
+      it 'responds with 200 status' do
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context 'when the note does not exist' do
+      before { get :show, params: { id: -1 } }
+
+      it 'responds with 404 status' do
+        expect(response).to have_http_status(:not_found)
+      end
+    end
   end
 end

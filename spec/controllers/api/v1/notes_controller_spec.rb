@@ -128,6 +128,34 @@ describe Api::V1::NotesController, type: :controller do
       end
     end
 
+    context 'when type param is empty' do
+      let(:notes_expected) { notes }
+
+      before { get :index, params: { type: '' } }
+
+      it 'responds with all the notes' do
+        expect(response_body.to_json).to eq(expected)
+      end
+
+      it 'responds with 200 status' do
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context 'when order param is empty' do
+      let(:notes_expected) { notes }
+
+      before { get :index, params: { order: '' } }
+
+      it 'responds with all the notes' do
+        expect(response_body.to_json).to eq(expected)
+      end
+
+      it 'responds with 200 status' do
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
     context 'when type param is invalid' do
       before { get :index, params: { type: 'banana' } }
 

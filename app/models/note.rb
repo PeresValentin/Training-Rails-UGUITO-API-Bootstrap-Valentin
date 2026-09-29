@@ -14,8 +14,8 @@ class Note < ApplicationRecord
   belongs_to :user
   has_one :utility, through: :user
   enum note_type: { review: 0, critique: 1 }
-  scope :with_type, ->(type) { where(note_type: type) if type }
-  scope :ordered_by_creation, ->(direction) { order(created_at: direction) if direction }
+  scope :with_type, ->(type) { where(note_type: type) if type.present? }
+  scope :ordered_by_creation, ->(direction) { order(created_at: direction) if direction.present? }
   validates :title, :content, :note_type, presence: true
   validate :review_content_must_be_short
 

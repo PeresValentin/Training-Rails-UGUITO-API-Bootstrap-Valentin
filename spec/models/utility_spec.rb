@@ -16,19 +16,23 @@ RSpec.describe Utility, type: :model do
   end
 
   describe '#note_content_length' do
-    let(:note) { Note.new(content: ('word ' * 200).strip) }
-
     context 'when the rules are not implemented' do
       it 'raises NotImplementedError' do
-        expect { described_class.new.note_content_length(note) }
+        expect { described_class.new.note_content_length(Note.new) }
           .to raise_error(NotImplementedError)
       end
     end
 
+    Rails.application.eager_load!
+
     described_class.subclasses.each do |utility_class|
       context "with #{utility_class}" do
-        it 'implements the rules' do
-          expect { utility_class.new.note_content_length(note) }.not_to raise_error
+        it 'implements short_note?' do
+          expect(utility_class.instance_method(:short_note?).owner).to eq(utility_class)
+        end
+
+        it 'implements medium_note?' do
+          expect(utility_class.instance_method(:medium_note?).owner).to eq(utility_class)
         end
       end
     end

@@ -69,6 +69,10 @@ describe Api::V1::NotesController, type: :controller do
       it 'responds with notes ordered from oldest to newest' do
         expect(response_body.to_json).to eq(expected)
       end
+
+      it 'responds with 200 status' do
+        expect(response).to have_http_status(:ok)
+      end
     end
 
     context 'when ordering by creation date descending' do
@@ -78,6 +82,10 @@ describe Api::V1::NotesController, type: :controller do
 
       it 'responds with notes ordered from newest to oldest' do
         expect(response_body.to_json).to eq(expected)
+      end
+
+      it 'responds with 200 status' do
+        expect(response).to have_http_status(:ok)
       end
     end
 
@@ -157,27 +165,19 @@ describe Api::V1::NotesController, type: :controller do
     end
 
     context 'when type param is invalid' do
+      let(:message) { I18n.t('errors.messages.invalid_note_type') }
+
       before { get :index, params: { type: 'banana' } }
 
-      it 'responds with 400 status' do
-        expect(response).to have_http_status(:bad_request)
-      end
-
-      it 'responds with an invalid type error' do
-        expect(response_body['error']).to eq('Invalid note type')
-      end
+      it_behaves_like 'bad request with message'
     end
 
     context 'when order param is invalid' do
+      let(:message) { I18n.t('errors.messages.invalid_order') }
+
       before { get :index, params: { order: 'banana' } }
 
-      it 'responds with 400 status' do
-        expect(response).to have_http_status(:bad_request)
-      end
-
-      it 'responds with an invalid order error' do
-        expect(response_body['error']).to eq('Invalid order')
-      end
+      it_behaves_like 'bad request with message'
     end
   end
 
@@ -185,18 +185,17 @@ describe Api::V1::NotesController, type: :controller do
     let!(:note) { create(:note) }
 
     context 'when the note exists' do
+      let(:record) { note }
       let(:expected) do
         ShowNoteSerializer.new(note).to_json
       end
 
       before { get :show, params: { id: note.id } }
 
+      it_behaves_like 'basic show endpoint'
+
       it 'responds with the expected note json' do
         expect(response_body.to_json).to eq(expected)
-      end
-
-      it 'responds with 200 status' do
-        expect(response).to have_http_status(:ok)
       end
     end
 

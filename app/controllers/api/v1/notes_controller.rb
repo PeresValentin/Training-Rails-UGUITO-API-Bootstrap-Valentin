@@ -14,7 +14,7 @@ module Api
       private
 
       def notes
-        Note.includes(:user, :utility)
+        Note.includes(:utility)
             .with_type(params[:type])
             .ordered_by_creation(params[:order])
             .page(params[:page])
@@ -22,12 +22,12 @@ module Api
       end
 
       def show_note
-        Note.find(params.require(:id))
+        Note.find(params[:id])
       end
 
       def validate_index_params
-        return render json: { error: 'Invalid note type' }, status: :bad_request if invalid_type?
-        return render json: { error: 'Invalid order' }, status: :bad_request if invalid_order?
+        raise Exceptions::InvalidParameterError, 'invalid_note_type' if invalid_type?
+        raise Exceptions::InvalidParameterError, 'invalid_order' if invalid_order?
       end
 
       def invalid_type?

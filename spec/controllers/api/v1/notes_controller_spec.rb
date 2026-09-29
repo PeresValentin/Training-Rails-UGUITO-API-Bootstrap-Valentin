@@ -13,10 +13,12 @@ describe Api::V1::NotesController, type: :controller do
     end
 
     let(:expected) do
-      ActiveModel::Serializer::CollectionSerializer.new(
-        notes_expected,
-        serializer: IndexNoteSerializer
-      ).to_json
+      JSON.parse(
+        ActiveModel::Serializer::CollectionSerializer.new(
+          notes_expected,
+          serializer: IndexNoteSerializer
+        ).to_json
+      )
     end
 
     context 'when fetching all the notes' do
@@ -25,7 +27,7 @@ describe Api::V1::NotesController, type: :controller do
       before { get :index }
 
       it 'responds with the expected notes json' do
-        expect(response_body.to_json).to eq(expected)
+        expect(response_body).to match_array(expected)
       end
 
       it 'responds with 200 status' do
@@ -39,7 +41,7 @@ describe Api::V1::NotesController, type: :controller do
       before { get :index, params: { type: 'review' } }
 
       it 'responds with only review notes' do
-        expect(response_body.to_json).to eq(expected)
+        expect(response_body).to match_array(expected)
       end
 
       it 'responds with 200 status' do
@@ -53,7 +55,7 @@ describe Api::V1::NotesController, type: :controller do
       before { get :index, params: { type: 'critique' } }
 
       it 'responds with only critique notes' do
-        expect(response_body.to_json).to eq(expected)
+        expect(response_body).to match_array(expected)
       end
 
       it 'responds with 200 status' do
@@ -67,7 +69,7 @@ describe Api::V1::NotesController, type: :controller do
       before { get :index, params: { order: 'asc' } }
 
       it 'responds with notes ordered from oldest to newest' do
-        expect(response_body.to_json).to eq(expected)
+        expect(response_body).to eq(expected)
       end
 
       it 'responds with 200 status' do
@@ -81,7 +83,7 @@ describe Api::V1::NotesController, type: :controller do
       before { get :index, params: { order: 'desc' } }
 
       it 'responds with notes ordered from newest to oldest' do
-        expect(response_body.to_json).to eq(expected)
+        expect(response_body).to eq(expected)
       end
 
       it 'responds with 200 status' do
@@ -101,7 +103,45 @@ describe Api::V1::NotesController, type: :controller do
       end
 
       it 'responds with the expected page' do
-        expect(response_body.to_json).to eq(expected)
+        expect(response_body).to eq(expected)
+      end
+
+      it 'responds with 200 status' do
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context 'when ordering notes created at the same time' do
+      let!(:tied_notes) { create_list(:note, 2, created_at: notes.first.created_at) }
+      let(:notes_expected) do
+        (notes + tied_notes).sort_by { |note| [note.created_at, note.id] }.reverse
+      end
+
+      before { get :index, params: { order: 'desc' } }
+
+      it 'responds with tied notes ordered by id' do
+        expect(response_body).to eq(expected)
+      end
+    end
+
+    context 'when page size exceeds the maximum' do
+      before do
+        create_list(:note, Note.max_per_page + 1, user: notes.first.user)
+        get :index, params: { page_size: Note.max_per_page + 1 }
+      end
+
+      it 'responds with at most the maximum page size' do
+        expect(response_body.size).to eq(Note.max_per_page)
+      end
+    end
+
+    context 'when pagination params are not scalar' do
+      let(:notes_expected) { notes }
+
+      before { get :index, params: { page: ['2'], page_size: ['2'] } }
+
+      it 'responds with the default page' do
+        expect(response_body).to match_array(expected)
       end
 
       it 'responds with 200 status' do
@@ -128,7 +168,7 @@ describe Api::V1::NotesController, type: :controller do
       end
 
       it 'responds with the expected notes' do
-        expect(response_body.to_json).to eq(expected)
+        expect(response_body).to eq(expected)
       end
 
       it 'responds with 200 status' do
@@ -142,7 +182,7 @@ describe Api::V1::NotesController, type: :controller do
       before { get :index, params: { type: '' } }
 
       it 'responds with all the notes' do
-        expect(response_body.to_json).to eq(expected)
+        expect(response_body).to match_array(expected)
       end
 
       it 'responds with 200 status' do
@@ -156,7 +196,7 @@ describe Api::V1::NotesController, type: :controller do
       before { get :index, params: { order: '' } }
 
       it 'responds with all the notes' do
-        expect(response_body.to_json).to eq(expected)
+        expect(response_body).to match_array(expected)
       end
 
       it 'responds with 200 status' do

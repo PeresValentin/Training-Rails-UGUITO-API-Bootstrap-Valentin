@@ -19,8 +19,12 @@ module Api
                     .includes(:utility)
                     .with_type(params[:type])
                     .ordered_by_creation(params[:order])
-                    .page(params[:page])
-                    .per(params[:page_size])
+                    .page(pagination_params[:page])
+                    .per(pagination_params[:page_size])
+      end
+
+      def pagination_params
+        params.permit(:page, :page_size)
       end
 
       def show_note

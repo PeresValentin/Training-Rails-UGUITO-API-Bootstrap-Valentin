@@ -60,7 +60,7 @@ RSpec.describe Note, type: :model do
     context 'when utility is North' do
       let(:utility) { create(:north_utility) }
 
-      context 'when content is short' do
+      context 'when content is at the short limit' do
         let(:content_words) { 50 }
 
         it 'returns short' do
@@ -68,7 +68,15 @@ RSpec.describe Note, type: :model do
         end
       end
 
-      context 'when content is medium' do
+      context 'when content exceeds the short limit' do
+        let(:content_words) { 51 }
+
+        it 'returns medium' do
+          expect(note.content_length).to eq('medium')
+        end
+      end
+
+      context 'when content is at the medium limit' do
         let(:content_words) { 100 }
 
         it 'returns medium' do
@@ -76,7 +84,7 @@ RSpec.describe Note, type: :model do
         end
       end
 
-      context 'when content is long' do
+      context 'when content exceeds the medium limit' do
         let(:content_words) { 101 }
 
         it 'returns long' do
@@ -88,7 +96,7 @@ RSpec.describe Note, type: :model do
     context 'when utility is South' do
       let(:utility) { create(:south_utility) }
 
-      context 'when content is short' do
+      context 'when content is at the short limit' do
         let(:content_words) { 60 }
 
         it 'returns short' do
@@ -96,7 +104,15 @@ RSpec.describe Note, type: :model do
         end
       end
 
-      context 'when content is medium' do
+      context 'when content exceeds the short limit' do
+        let(:content_words) { 61 }
+
+        it 'returns medium' do
+          expect(note.content_length).to eq('medium')
+        end
+      end
+
+      context 'when content is at the medium limit' do
         let(:content_words) { 120 }
 
         it 'returns medium' do
@@ -104,7 +120,7 @@ RSpec.describe Note, type: :model do
         end
       end
 
-      context 'when content is long' do
+      context 'when content exceeds the medium limit' do
         let(:content_words) { 121 }
 
         it 'returns long' do

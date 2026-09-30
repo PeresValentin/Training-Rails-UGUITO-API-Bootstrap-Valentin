@@ -27,12 +27,12 @@ RSpec.describe Utility, type: :model do
 
     described_class.subclasses.each do |utility_class|
       context "with #{utility_class}" do
-        it 'implements short_note?' do
-          expect(utility_class.instance_method(:short_note?).owner).to eq(utility_class)
+        it 'implements short_note_limit' do
+          expect(utility_class.instance_method(:short_note_limit).owner).to eq(utility_class)
         end
 
-        it 'implements medium_note?' do
-          expect(utility_class.instance_method(:medium_note?).owner).to eq(utility_class)
+        it 'implements medium_note_limit' do
+          expect(utility_class.instance_method(:medium_note_limit).owner).to eq(utility_class)
         end
       end
     end

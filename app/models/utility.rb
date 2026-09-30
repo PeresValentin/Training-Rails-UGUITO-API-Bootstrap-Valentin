@@ -74,8 +74,8 @@ class Utility < ApplicationRecord
   end
 
   def note_content_length(note)
-    return 'short' if short_note?(note)
-    return 'medium' if medium_note?(note)
+    return 'short' if note.word_count <= short_note_limit
+    return 'medium' if note.word_count <= medium_note_limit
 
     'long'
   end
@@ -86,11 +86,11 @@ class Utility < ApplicationRecord
     type.chomp('Utility')
   end
 
-  def short_note?(_note)
-    raise NotImplementedError, "#{self.class.name} must implement #short_note?"
+  def short_note_limit
+    raise NotImplementedError, "#{self.class.name} must implement #short_note_limit"
   end
 
-  def medium_note?(_note)
-    raise NotImplementedError, "#{self.class.name} must implement #medium_note?"
+  def medium_note_limit
+    raise NotImplementedError, "#{self.class.name} must implement #medium_note_limit"
   end
 end

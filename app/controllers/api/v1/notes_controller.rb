@@ -1,6 +1,7 @@
 module Api
   module V1
     class NotesController < ApplicationController
+      before_action :authenticate_user!
       before_action :validate_index_params, only: :index
 
       def index
@@ -14,15 +15,16 @@ module Api
       private
 
       def notes
-        Note.includes(:utility)
-            .with_type(params[:type])
-            .ordered_by_creation(params[:order])
-            .page(params[:page])
-            .per(params[:page_size])
+        current_user.notes
+                    .includes(:utility)
+                    .with_type(params[:type])
+                    .ordered_by_creation(params[:order])
+                    .page(params[:page])
+                    .per(params[:page_size])
       end
 
       def show_note
-        Note.find(params[:id])
+        current_user.notes.find(params[:id])
       end
 
       def validate_index_params

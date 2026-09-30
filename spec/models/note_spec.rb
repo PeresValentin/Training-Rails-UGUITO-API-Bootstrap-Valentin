@@ -170,7 +170,13 @@ RSpec.describe Note, type: :model do
         it 'adds an error to content' do
           note.valid?
 
-          expect(note.errors.added?(:content, :review_too_long)).to be(true)
+          expect(note.errors.added?(:content, :review_too_long, limit: 50)).to be(true)
+        end
+
+        it 'returns the review limit message' do
+          note.valid?
+
+          expect(note.errors[:content]).to include('Una reseña no puede superar las 50 palabras.')
         end
       end
     end
@@ -196,7 +202,13 @@ RSpec.describe Note, type: :model do
         it 'adds an error to content' do
           note.valid?
 
-          expect(note.errors.added?(:content, :review_too_long)).to be(true)
+          expect(note.errors.added?(:content, :review_too_long, limit: 60)).to be(true)
+        end
+
+        it 'returns the review limit message' do
+          note.valid?
+
+          expect(note.errors[:content]).to include('Una reseña no puede superar las 60 palabras.')
         end
       end
     end

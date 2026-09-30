@@ -37,6 +37,6 @@ class Note < ApplicationRecord
     return if utility.blank?
     return if content_length == 'short'
 
-    errors.add(:content, :review_too_long)
+    errors.add(:content, :review_too_long, limit: utility.short_note_limit)
   end
 end

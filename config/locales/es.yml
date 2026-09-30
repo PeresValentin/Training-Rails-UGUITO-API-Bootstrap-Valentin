@@ -43,4 +43,4 @@ es:
         note:
           attributes:
             content:
-              review_too_long: "es demasiado largo para una review"
+              review_too_long: "Una reseña no puede superar las %{limit} palabras."

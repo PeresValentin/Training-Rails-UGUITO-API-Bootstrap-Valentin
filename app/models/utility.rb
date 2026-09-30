@@ -80,14 +80,14 @@ class Utility < ApplicationRecord
     'long'
   end
 
+  def short_note_limit
+    raise NotImplementedError, "#{self.class.name} must implement #short_note_limit"
+  end
+
   private
 
   def utility_type
     type.chomp('Utility')
-  end
-
-  def short_note_limit
-    raise NotImplementedError, "#{self.class.name} must implement #short_note_limit"
   end
 
   def medium_note_limit

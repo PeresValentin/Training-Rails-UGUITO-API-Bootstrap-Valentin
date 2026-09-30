@@ -5,14 +5,14 @@ RSpec.describe Note, type: :model do
     build(:note)
   end
 
-  %i[title content note_type].each do |value|
-    it { is_expected.to validate_presence_of(value) }
-  end
+  it { is_expected.to validate_presence_of(:title) }
+  it { is_expected.to validate_presence_of(:content) }
+  it { is_expected.to validate_presence_of(:note_type) }
 
   it { is_expected.to belong_to(:user) }
   it { is_expected.to have_one(:utility).through(:user) }
 
-  it do
+  it 'defines review and critique types' do
     expect(note).to define_enum_for(:note_type)
       .with_values(review: 0, critique: 1)
   end
@@ -22,19 +22,12 @@ RSpec.describe Note, type: :model do
   end
 
   describe '#word_count' do
-    context 'when content has one word' do
-      let(:note) { build(:note, content: 'hola') }
+    context 'when content has words' do
+      let(:words) { Faker::Number.between(from: 1, to: 50) }
+      let(:note) { build(:note, content: Faker::Lorem.sentence(word_count: words)) }
 
-      it 'returns 1' do
-        expect(note.word_count).to eq(1)
-      end
-    end
-
-    context 'when content has multiple words' do
-      let(:note) { build(:note, content: 'una nota corta') }
-
-      it 'returns 3' do
-        expect(note.word_count).to eq(3)
+      it 'returns the number of words' do
+        expect(note.word_count).to eq(words)
       end
     end
 

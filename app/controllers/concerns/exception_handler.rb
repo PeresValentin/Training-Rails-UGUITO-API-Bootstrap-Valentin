@@ -13,6 +13,8 @@ module ExceptionHandler
     end
     rescue_from Exceptions::UtilityUnavailableError, with: :render_utility_unavailable
     rescue_from Exceptions::InvalidParameterError, with: :render_invalid_parameter
+    rescue_from ActiveRecord::RecordInvalid, with: :render_record_invalid
+    rescue_from Exceptions::InvalidNoteTypeError, with: :render_invalid_note_type
   end
 
   private
@@ -49,5 +51,21 @@ module ExceptionHandler
   def render_error(identifier, message: nil, meta: nil, status: :bad_request)
     error = ErrorResponseBuilder.new(status).add_error(identifier, message: message, meta: meta)
     render json: error, status: status
+  end
+
+  def render_record_invalid(error)
+    render_simple_error(error.record.errors.first.message, :unprocessable_entity)
+  end
+
+  def render_invalid_note_type
+    render_simple_error(I18n.t('notes.invalid_type'), :unprocessable_entity)
+  end
+
+  def render_missing_note_parameters
+    render_simple_error(I18n.t('notes.missing_parameters'), :bad_request)
+  end
+
+  def render_simple_error(message, status)
+    render json: { error: message }, status: status
   end
 end

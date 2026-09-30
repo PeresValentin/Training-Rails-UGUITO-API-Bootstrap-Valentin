@@ -3,6 +3,8 @@ module Api
     class NotesController < ApplicationController
       before_action :authenticate_user!
       before_action :validate_index_params, only: :index
+      before_action :validate_create_params, only: :create
+      rescue_from ActionController::ParameterMissing, with: :render_missing_note_parameters
 
       def index
         render json: notes, status: :ok, each_serializer: IndexNoteSerializer
@@ -10,6 +12,11 @@ module Api
 
       def show
         render json: show_note, status: :ok, serializer: ShowNoteSerializer
+      end
+
+      def create
+        current_user.notes.create!(note_params)
+        render json: { message: I18n.t('notes.created') }, status: :created
       end
 
       private
@@ -42,6 +49,16 @@ module Api
 
       def invalid_order?
         params[:order].present? && !%w[asc desc].include?(params[:order])
+      end
+
+      def note_params
+        note = params.require(:note)
+        note.require(%i[title type content])
+        note.permit(:title, :content).merge(note_type: note[:type])
+      end
+
+      def validate_create_params
+        raise Exceptions::InvalidNoteTypeError unless Note.note_types.key?(note_params[:note_type])
       end
     end
   end

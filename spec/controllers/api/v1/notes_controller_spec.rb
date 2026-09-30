@@ -281,4 +281,129 @@ describe Api::V1::NotesController, type: :controller do
       it_behaves_like 'unauthorized'
     end
   end
+
+  describe 'POST #create' do
+    shared_examples 'note not created with error' do |status, message|
+      it "responds with #{status} status" do
+        expect(response).to have_http_status(status)
+      end
+
+      it 'responds with the error message' do
+        expect(response_body).to eq('error' => message)
+      end
+
+      it 'does not create a note' do
+        expect(Note.count).to eq(0)
+      end
+    end
+
+    let(:note_params) { { title: 'Reseña', type: 'review', content: 'Una nota corta' } }
+
+    context 'when there is a user logged in' do
+      include_context 'with authenticated user'
+
+      context 'when the params are valid' do
+        before { post :create, params: { note: note_params } }
+
+        it 'responds with 201 status' do
+          expect(response).to have_http_status(:created)
+        end
+
+        it 'responds with the created message' do
+          expect(response_body).to eq('message' => 'Nota creada con exito.')
+        end
+
+        it 'creates the note for the authenticated user' do
+          expect(user.notes.first)
+            .to have_attributes(title: 'Reseña', note_type: 'review', content: 'Una nota corta')
+        end
+      end
+
+      context 'when a user_id of another user is sent' do
+        let(:other_user) { create(:user) }
+
+        before { post :create, params: { note: note_params.merge(user_id: other_user.id) } }
+
+        it 'creates the note for the authenticated user' do
+          expect(user.notes.count).to eq(1)
+        end
+
+        it 'does not create a note for the other user' do
+          expect(other_user.notes).to be_empty
+        end
+      end
+
+      context 'when the note param is missing' do
+        before { post :create }
+
+        it_behaves_like 'note not created with error', :bad_request, 'Faltan parametros requeridos.'
+      end
+
+      %i[title type content].each do |param|
+        context "when #{param} is missing" do
+          before { post :create, params: { note: note_params.except(param) } }
+
+          it_behaves_like 'note not created with error', :bad_request,
+                          'Faltan parametros requeridos.'
+        end
+      end
+
+      context 'when the type is invalid' do
+        before { post :create, params: { note: note_params.merge(type: 'banana') } }
+
+        it_behaves_like 'note not created with error', :unprocessable_entity,
+                        'El tipo de nota no es válido.'
+      end
+
+      context 'when a review exceeds the North word limit' do
+        let(:user) { create(:user, utility: create(:north_utility)) }
+
+        before do
+          post :create, params: { note: note_params.merge(content: ('word ' * 51).strip) }
+        end
+
+        it_behaves_like 'note not created with error', :unprocessable_entity,
+                        'Una reseña no puede superar las 50 palabras.'
+      end
+
+      context 'when a review exceeds the South word limit' do
+        let(:user) { create(:user, utility: create(:south_utility)) }
+
+        before do
+          post :create, params: { note: note_params.merge(content: ('word ' * 61).strip) }
+        end
+
+        it_behaves_like 'note not created with error', :unprocessable_entity,
+                        'Una reseña no puede superar las 60 palabras.'
+      end
+
+      context 'when a critique exceeds the review word limit' do
+        let(:user) { create(:user, utility: create(:north_utility)) }
+
+        before do
+          post :create, params: {
+            note: note_params.merge(type: 'critique', content: ('word ' * 51).strip)
+          }
+        end
+
+        it 'responds with 201 status' do
+          expect(response).to have_http_status(:created)
+        end
+
+        it 'creates the note' do
+          expect(user.notes.count).to eq(1)
+        end
+      end
+    end
+
+    context 'when there is not a user logged in' do
+      before { post :create, params: { note: note_params } }
+
+      it_behaves_like 'unauthorized'
+
+      it 'does not create a note' do
+        expect(Note.count).to eq(0)
+      end
+    end
+  end
 end

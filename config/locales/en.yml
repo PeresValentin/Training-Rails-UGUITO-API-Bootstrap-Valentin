@@ -37,6 +37,11 @@ en:
       invalid_note_type: "The note type is invalid"
       invalid_order: "The order is invalid"
 
+  notes:
+    created: "Note created successfully."
+    missing_parameters: "Required parameters are missing."
+    invalid_type: "The note type is not valid."
+
   activerecord:
     errors:
       models:

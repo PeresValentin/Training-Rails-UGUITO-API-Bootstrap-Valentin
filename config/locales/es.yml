@@ -36,7 +36,7 @@ es:
     messages:
       invalid_note_type: "El tipo de nota no es válido."
       invalid_order: "El orden es inválido"
-      internal_server_error: "Faltan parametros requeridos."
+      missing_parameters: "Faltan parametros requeridos."
 
   notes:
     created: "Nota creada con exito."

@@ -14,13 +14,8 @@ module Api
       end
 
       def create
-        note = current_user.notes.new(note_params)
-        if note.save
-          render json: { message: I18n.t('notes.created') }, status: :created
-        else
-          error = note.errors.first
-          render_error(error.type, message: error.message, status: :unprocessable_entity)
-        end
+        current_user.notes.create!(note_params)
+        render json: { message: I18n.t('notes.created') }, status: :created
       end
 
       private
@@ -64,7 +59,7 @@ module Api
       def validate_create_params
         return if Note.note_types.key?(note_params[:note_type])
 
-        render_error(:invalid_note_type, status: :unprocessable_entity)
+        render_simple_error(I18n.t('errors.messages.invalid_note_type'), :unprocessable_entity)
       end
     end
   end

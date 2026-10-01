@@ -283,7 +283,15 @@ describe Api::V1::NotesController, type: :controller do
   end
 
   describe 'POST #create' do
-    shared_examples 'note not created' do
+    shared_examples 'note not created with error' do
+      it 'responds with the error status' do
+        expect(response).to have_http_status(status)
+      end
+
+      it 'responds with the error message' do
+        expect(response_body).to eq('error' => message)
+      end
+
       it 'does not create a note' do
         expect(Note.count).to eq(0)
       end
@@ -348,61 +356,52 @@ describe Api::V1::NotesController, type: :controller do
       end
 
       context 'when a required param is missing' do
-        context 'when the note param is missing' do
-          let(:missing_parameter) { 'note' }
+        let(:status) { :bad_request }
+        let(:message) { 'Faltan parametros requeridos.' }
 
+        context 'when the note param is missing' do
           before { post :create }
 
-          it_behaves_like 'bad request when a parameter is missing'
-          it_behaves_like 'note not created'
+          it_behaves_like 'note not created with error'
         end
 
         context 'when title is missing' do
-          let(:missing_parameter) { 'title' }
-
           before { post :create, params: { note: note_params.except(:title) } }
 
-          it_behaves_like 'bad request when a parameter is missing'
-          it_behaves_like 'note not created'
+          it_behaves_like 'note not created with error'
         end
 
         context 'when type is missing' do
-          let(:missing_parameter) { 'type' }
-
           before { post :create, params: { note: note_params.except(:type) } }
 
-          it_behaves_like 'bad request when a parameter is missing'
-          it_behaves_like 'note not created'
+          it_behaves_like 'note not created with error'
         end
 
         context 'when content is missing' do
-          let(:missing_parameter) { 'content' }
-
           before { post :create, params: { note: note_params.except(:content) } }
 
-          it_behaves_like 'bad request when a parameter is missing'
-          it_behaves_like 'note not created'
+          it_behaves_like 'note not created with error'
         end
       end
 
       context 'when the type is invalid' do
+        let(:status) { :unprocessable_entity }
         let(:message) { 'El tipo de nota no es válido.' }
 
         before { post :create, params: { note: note_params.merge(type: 'banana') } }
 
-        it_behaves_like 'unprocessable entity with message'
-        it_behaves_like 'note not created'
+        it_behaves_like 'note not created with error'
       end
 
       context 'when a review exceeds the word limit' do
+        let(:status) { :unprocessable_entity }
         let(:message) { "Una reseña no puede superar las #{short_limit} palabras." }
 
         before do
           post :create, params: { note: note_params.merge(type: 'review', content: long_content) }
         end
 
-        it_behaves_like 'unprocessable entity with message'
-        it_behaves_like 'note not created'
+        it_behaves_like 'note not created with error'
       end
     end
 
@@ -410,7 +409,10 @@ describe Api::V1::NotesController, type: :controller do
       before { post :create, params: { note: note_params } }
 
       it_behaves_like 'unauthorized'
-      it_behaves_like 'note not created'
+
+      it 'does not create a note' do
+        expect(Note.count).to eq(0)
+      end
     end
   end
 end

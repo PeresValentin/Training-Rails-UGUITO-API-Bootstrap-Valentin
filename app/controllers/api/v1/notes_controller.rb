@@ -4,7 +4,6 @@ module Api
       before_action :authenticate_user!
       before_action :validate_index_params, only: :index
       before_action :validate_create_params, only: :create
-      rescue_from ActionController::ParameterMissing, with: :render_missing_note_parameters
 
       def index
         render json: notes, status: :ok, each_serializer: IndexNoteSerializer
@@ -58,7 +57,9 @@ module Api
       end
 
       def validate_create_params
-        raise Exceptions::InvalidNoteTypeError unless Note.note_types.key?(note_params[:note_type])
+        return if Note.note_types.key?(note_params[:note_type])
+
+        render_simple_error(I18n.t('notes.invalid_type'), :unprocessable_entity)
       end
     end
   end

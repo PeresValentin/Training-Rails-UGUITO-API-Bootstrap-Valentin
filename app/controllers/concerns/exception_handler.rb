@@ -3,7 +3,7 @@ module ExceptionHandler
   extend ActiveSupport::Concern
 
   included do
-    rescue_from ActionController::ParameterMissing, with: :render_incorrect_parameter
+    rescue_from ActionController::ParameterMissing, with: :render_missing_parameters
     rescue_from ActionController::UnpermittedParameters, with: :render_incorrect_parameter
     rescue_from ActiveRecord::RecordNotFound, with: :render_nothing_not_found
     rescue_from Exceptions::ClientForbiddenError, with: :render_client_forbidden
@@ -14,7 +14,6 @@ module ExceptionHandler
     rescue_from Exceptions::UtilityUnavailableError, with: :render_utility_unavailable
     rescue_from Exceptions::InvalidParameterError, with: :render_invalid_parameter
     rescue_from ActiveRecord::RecordInvalid, with: :render_record_invalid
-    rescue_from Exceptions::InvalidNoteTypeError, with: :render_invalid_note_type
   end
 
   private
@@ -57,12 +56,8 @@ module ExceptionHandler
     render_simple_error(error.record.errors.first.message, :unprocessable_entity)
   end
 
-  def render_invalid_note_type
-    render_simple_error(I18n.t('notes.invalid_type'), :unprocessable_entity)
-  end
-
-  def render_missing_note_parameters
-    render_simple_error(I18n.t('notes.missing_parameters'), :bad_request)
+  def render_missing_parameters
+    render_simple_error(I18n.t('errors.messages.missing_parameters'), :bad_request)
   end
 
   def render_simple_error(message, status)

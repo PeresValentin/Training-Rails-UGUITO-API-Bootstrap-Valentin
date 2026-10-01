@@ -36,10 +36,10 @@ es:
     messages:
       invalid_note_type: "El tipo de nota es inválido"
       invalid_order: "El orden es inválido"
+      missing_parameters: "Faltan parametros requeridos."
 
   notes:
     created: "Nota creada con exito."
-    missing_parameters: "Faltan parametros requeridos."
     invalid_type: "El tipo de nota no es válido."
 
   activerecord:

@@ -3,7 +3,7 @@ module ExceptionHandler
   extend ActiveSupport::Concern
 
   included do
-    rescue_from ActionController::ParameterMissing, with: :render_missing_parameters
+    rescue_from ActionController::ParameterMissing, with: :render_incorrect_parameter
     rescue_from ActionController::UnpermittedParameters, with: :render_incorrect_parameter
     rescue_from ActiveRecord::RecordNotFound, with: :render_nothing_not_found
     rescue_from Exceptions::ClientForbiddenError, with: :render_client_forbidden
@@ -26,7 +26,7 @@ module ExceptionHandler
   def render_incorrect_parameter(error)
     message = I18n.t('errors.messages.internal_server_error')
     render_error(
-      :param_is_missing, message: message, meta: error.message, status: :bad_request
+      :param_is_missing, message: message, meta: error.original_message, status: :bad_request
     )
   end
 
@@ -49,13 +49,5 @@ module ExceptionHandler
   def render_error(identifier, message: nil, meta: nil, status: :bad_request)
     error = ErrorResponseBuilder.new(status).add_error(identifier, message: message, meta: meta)
     render json: error, status: status
-  end
-
-  def render_missing_parameters
-    render_simple_error(I18n.t('errors.messages.missing_parameters'), :bad_request)
-  end
-
-  def render_simple_error(message, status)
-    render json: { error: message }, status: status
   end
 end

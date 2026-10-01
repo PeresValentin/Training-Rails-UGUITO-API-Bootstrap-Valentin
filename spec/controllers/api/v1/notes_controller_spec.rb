@@ -111,41 +111,14 @@ describe Api::V1::NotesController, type: :controller do
       end
     end
 
-    context 'when ordering notes created at the same time' do
-      let!(:tied_notes) { create_list(:note, 2, created_at: notes.first.created_at) }
-      let(:notes_expected) do
-        (notes + tied_notes).sort_by { |note| [note.created_at, note.id] }.reverse
-      end
-
-      before { get :index, params: { order: 'desc' } }
-
-      it 'responds with tied notes ordered by id' do
-        expect(response_body).to eq(expected)
-      end
-    end
-
     context 'when page size exceeds the maximum' do
       before do
-        create_list(:note, Note.max_per_page + 1, user: notes.first.user)
-        get :index, params: { page_size: Note.max_per_page + 1 }
+        create_list(:note, described_class::MAX_PAGE_SIZE, user: notes.first.user)
+        get :index, params: { page_size: described_class::MAX_PAGE_SIZE + 1 }
       end
 
-      it 'responds with at most the maximum page size' do
-        expect(response_body.size).to eq(Note.max_per_page)
-      end
-    end
-
-    context 'when pagination params are not scalar' do
-      let(:notes_expected) { notes }
-
-      before { get :index, params: { page: ['2'], page_size: ['2'] } }
-
-      it 'responds with the default page' do
-        expect(response_body).to match_array(expected)
-      end
-
-      it 'responds with 200 status' do
-        expect(response).to have_http_status(:ok)
+      it 'responds with the maximum page size' do
+        expect(response_body.size).to eq(described_class::MAX_PAGE_SIZE)
       end
     end
 

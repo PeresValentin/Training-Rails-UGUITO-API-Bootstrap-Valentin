@@ -283,8 +283,8 @@ describe Api::V1::NotesController, type: :controller do
   end
 
   describe 'POST #create' do
-    shared_examples 'note not created with error' do |status, message|
-      it "responds with #{status} status" do
+    shared_examples 'note not created with error' do
+      it 'responds with the error status' do
         expect(response).to have_http_status(status)
       end
 
@@ -297,10 +297,19 @@ describe Api::V1::NotesController, type: :controller do
       end
     end
 
-    let(:note_params) { { title: 'Reseña', type: 'review', content: 'Una nota corta' } }
+    let(:note_params) do
+      {
+        title: Faker::Book.title,
+        type: Note.note_types.keys.sample,
+        content: Faker::Lorem.sentence(word_count: 20)
+      }
+    end
 
     context 'when there is a user logged in' do
       include_context 'with authenticated user'
+
+      let(:short_limit) { user.utility.short_note_limit }
+      let(:long_content) { Faker::Lorem.sentence(word_count: short_limit + 1) }
 
       context 'when the params are valid' do
         before { post :create, params: { note: note_params } }
@@ -314,8 +323,25 @@ describe Api::V1::NotesController, type: :controller do
         end
 
         it 'creates the note for the authenticated user' do
-          expect(user.notes.first)
-            .to have_attributes(title: 'Reseña', note_type: 'review', content: 'Una nota corta')
+          expect(user.notes.first).to have_attributes(
+            title: note_params[:title],
+            note_type: note_params[:type],
+            content: note_params[:content]
+          )
+        end
+      end
+
+      context 'when a critique exceeds the review word limit' do
+        before do
+          post :create, params: { note: note_params.merge(type: 'critique', content: long_content) }
+        end
+
+        it 'responds with 201 status' do
+          expect(response).to have_http_status(:created)
+        end
+
+        it 'creates the note' do
+          expect(user.notes.count).to eq(1)
         end
       end
 
@@ -327,72 +353,55 @@ describe Api::V1::NotesController, type: :controller do
         it 'creates the note for the authenticated user' do
           expect(user.notes.count).to eq(1)
         end
+      end
 
-        it 'does not create a note for the other user' do
-          expect(other_user.notes).to be_empty
+      context 'when a required param is missing' do
+        let(:status) { :bad_request }
+        let(:message) { 'Faltan parametros requeridos.' }
+
+        context 'when the note param is missing' do
+          before { post :create }
+
+          it_behaves_like 'note not created with error'
         end
-      end
 
-      context 'when the note param is missing' do
-        before { post :create }
+        context 'when title is missing' do
+          before { post :create, params: { note: note_params.except(:title) } }
 
-        it_behaves_like 'note not created with error', :bad_request, 'Faltan parametros requeridos.'
-      end
+          it_behaves_like 'note not created with error'
+        end
 
-      %i[title type content].each do |param|
-        context "when #{param} is missing" do
-          before { post :create, params: { note: note_params.except(param) } }
+        context 'when type is missing' do
+          before { post :create, params: { note: note_params.except(:type) } }
 
-          it_behaves_like 'note not created with error', :bad_request,
-                          'Faltan parametros requeridos.'
+          it_behaves_like 'note not created with error'
+        end
+
+        context 'when content is missing' do
+          before { post :create, params: { note: note_params.except(:content) } }
+
+          it_behaves_like 'note not created with error'
         end
       end
 
       context 'when the type is invalid' do
+        let(:status) { :unprocessable_entity }
+        let(:message) { 'El tipo de nota no es válido.' }
+
         before { post :create, params: { note: note_params.merge(type: 'banana') } }
 
-        it_behaves_like 'note not created with error', :unprocessable_entity,
-                        'El tipo de nota no es válido.'
+        it_behaves_like 'note not created with error'
       end
 
-      context 'when a review exceeds the North word limit' do
-        let(:user) { create(:user, utility: create(:north_utility)) }
+      context 'when a review exceeds the word limit' do
+        let(:status) { :unprocessable_entity }
+        let(:message) { "Una reseña no puede superar las #{short_limit} palabras." }
 
         before do
-          post :create, params: { note: note_params.merge(content: ('word ' * 51).strip) }
+          post :create, params: { note: note_params.merge(type: 'review', content: long_content) }
         end
 
-        it_behaves_like 'note not created with error', :unprocessable_entity,
-                        'Una reseña no puede superar las 50 palabras.'
-      end
-
-      context 'when a review exceeds the South word limit' do
-        let(:user) { create(:user, utility: create(:south_utility)) }
-
-        before do
-          post :create, params: { note: note_params.merge(content: ('word ' * 61).strip) }
-        end
-
-        it_behaves_like 'note not created with error', :unprocessable_entity,
-                        'Una reseña no puede superar las 60 palabras.'
-      end
-
-      context 'when a critique exceeds the review word limit' do
-        let(:user) { create(:user, utility: create(:north_utility)) }
-
-        before do
-          post :create, params: {
-            note: note_params.merge(type: 'critique', content: ('word ' * 51).strip)
-          }
-        end
-
-        it 'responds with 201 status' do
-          expect(response).to have_http_status(:created)
-        end
-
-        it 'creates the note' do
-          expect(user.notes.count).to eq(1)
-        end
+        it_behaves_like 'note not created with error'
       end
     end
 

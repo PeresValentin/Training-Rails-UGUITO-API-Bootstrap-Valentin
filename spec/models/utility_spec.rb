@@ -14,4 +14,13 @@ RSpec.describe Utility, type: :model do
   it 'has a valid factory' do
     expect(subject).to be_valid
   end
+
+  describe '#note_content_length' do
+    context 'when the rules are not implemented' do
+      it 'raises NotImplementedError' do
+        expect { described_class.new.note_content_length(Note.new) }
+          .to raise_error(NotImplementedError)
+      end
+    end
+  end
 end

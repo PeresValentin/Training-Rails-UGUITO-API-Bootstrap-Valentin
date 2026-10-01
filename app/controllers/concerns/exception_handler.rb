@@ -13,7 +13,6 @@ module ExceptionHandler
     end
     rescue_from Exceptions::UtilityUnavailableError, with: :render_utility_unavailable
     rescue_from Exceptions::InvalidParameterError, with: :render_invalid_parameter
-    rescue_from ActiveRecord::RecordInvalid, with: :render_record_invalid
   end
 
   private
@@ -50,10 +49,6 @@ module ExceptionHandler
   def render_error(identifier, message: nil, meta: nil, status: :bad_request)
     error = ErrorResponseBuilder.new(status).add_error(identifier, message: message, meta: meta)
     render json: error, status: status
-  end
-
-  def render_record_invalid(error)
-    render_simple_error(error.record.errors.first.message, :unprocessable_entity)
   end
 
   def render_missing_parameters

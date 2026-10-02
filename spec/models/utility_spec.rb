@@ -9,9 +9,6 @@ RSpec.describe Utility, type: :model do
     it { is_expected.to validate_presence_of(value) }
   end
 
-  it { is_expected.to validate_presence_of(:short_note_limit) }
-  it { is_expected.to validate_presence_of(:medium_note_limit) }
-
   it { is_expected.to have_many(:users).dependent(:destroy) }
 
   it 'has a valid factory' do
@@ -21,7 +18,7 @@ RSpec.describe Utility, type: :model do
   describe '#note_content_length' do
     context 'when the rules are not implemented' do
       it 'raises NotImplementedError' do
-        expect { described_class.new.note_content_length(Note.new) }
+        expect { build(:utility, type: described_class.name).note_content_length(Note.new) }
           .to raise_error(NotImplementedError)
       end
     end

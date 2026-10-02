@@ -115,8 +115,8 @@ ActiveRecord::Schema.define(version: 2026_10_02_123503) do
     t.jsonb "jsonb", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "short_note_limit", null: false
-    t.integer "medium_note_limit", null: false
+    t.integer "short_note_limit"
+    t.integer "medium_note_limit"
   end
 
   add_foreign_key "books", "users"

@@ -15,8 +15,8 @@
 #  jsonb                                :jsonb
 #  created_at                           :datetime         not null
 #  updated_at                           :datetime         not null
-#  short_note_limit                     :integer          not null
-#  medium_note_limit                    :integer          not null
+#  short_note_limit                     :integer
+#  medium_note_limit                    :integer
 #
 class Utility < ApplicationRecord
   include EntityWithCode
@@ -28,7 +28,6 @@ class Utility < ApplicationRecord
 
   validates :name, uniqueness: true
   validates :name, :type, presence: true
-  validates :short_note_limit, :medium_note_limit, presence: true
 
   store_accessor :integration_urls, :external_api_authentication_url, :books_data_url
 
@@ -77,6 +76,7 @@ class Utility < ApplicationRecord
   end
 
   def note_content_length(note)
+    return if short_note_limit.nil? || medium_note_limit.nil?
     return 'short' if short_note?(note)
     return 'medium' if medium_note?(note)
 

@@ -131,6 +131,24 @@ RSpec.describe Note, type: :model do
         let(:medium_limit) { utility.medium_note_limit }
       end
     end
+
+    context 'when utility has no short note limit' do
+      let(:utility) { create(:utility, short_note_limit: nil) }
+      let(:note) { build(:note, user: user) }
+
+      it 'returns nil' do
+        expect(note.content_length).to be_nil
+      end
+    end
+
+    context 'when utility has no medium note limit' do
+      let(:utility) { create(:utility, medium_note_limit: nil) }
+      let(:note) { build(:note, user: user) }
+
+      it 'returns nil' do
+        expect(note.content_length).to be_nil
+      end
+    end
   end
 
   describe 'review content limit' do
@@ -157,6 +175,15 @@ RSpec.describe Note, type: :model do
 
       it_behaves_like 'review limited to short content' do
         let(:short_limit) { utility.short_note_limit }
+      end
+    end
+
+    context 'when utility has no note length limits' do
+      let(:utility) { create(:utility, short_note_limit: nil, medium_note_limit: nil) }
+      let(:note) { build(:note, user: user, note_type: :review) }
+
+      it 'is valid' do
+        expect(note).to be_valid
       end
     end
   end

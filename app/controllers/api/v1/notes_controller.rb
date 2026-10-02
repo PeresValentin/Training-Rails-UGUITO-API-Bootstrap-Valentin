@@ -1,6 +1,8 @@
 module Api
   module V1
     class NotesController < ApplicationController
+      MAX_PAGE_SIZE = 100
+
       before_action :authenticate_user!
       before_action :validate_index_params, only: :index
       before_action :validate_create_params, only: :create
@@ -25,12 +27,9 @@ module Api
                     .includes(:utility)
                     .with_type(params[:type])
                     .ordered_by_creation(params[:order])
-                    .page(pagination_params[:page])
-                    .per(pagination_params[:page_size])
-      end
-
-      def pagination_params
-        params.permit(:page, :page_size)
+                    .page(params[:page])
+                    .per(params[:page_size])
+                    .max_paginates_per(MAX_PAGE_SIZE)
       end
 
       def show_note
@@ -38,8 +37,9 @@ module Api
       end
 
       def validate_index_params
-        raise Exceptions::InvalidParameterError, 'invalid_note_type' if invalid_type?
-        raise Exceptions::InvalidParameterError, 'invalid_order' if invalid_order?
+        return render_error(:invalid_note_type) if invalid_type?
+
+        render_error(:invalid_order) if invalid_order?
       end
 
       def invalid_type?

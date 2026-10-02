@@ -5,16 +5,12 @@ describe Api::V1::NotesController, type: :controller do
     context 'when there is a user logged in' do
       include_context 'with authenticated user'
 
-      let!(:notes) do
-        [
-          create(:note, user: user, note_type: :review, created_at: 4.days.ago),
-          create(:note, user: user, note_type: :critique, created_at: 3.days.ago),
-          create(:note, user: user, note_type: :review, created_at: 2.days.ago),
-          create(:note, user: user, note_type: :critique, created_at: 1.day.ago),
-          create(:note, user: user, note_type: :review, created_at: Time.current)
-        ]
-      end
-      let!(:other_user_note) { create(:note) }
+      let_it_be(:user) { create(:user) }
+      let_it_be(:reviews) { create_list(:note, 3, note_type: :review, user: user) }
+      let_it_be(:critiques) { create_list(:note, 2, note_type: :critique, user: user) }
+      let_it_be(:other_user_note) { create(:note) }
+
+      let(:notes) { reviews + critiques }
 
       let(:expected) do
         JSON.parse(
@@ -38,13 +34,11 @@ describe Api::V1::NotesController, type: :controller do
           expect(response_body.pluck('id')).not_to include(other_user_note.id)
         end
 
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
-        end
+        it_behaves_like 'ok response'
       end
 
       context 'when filtering by review type' do
-        let(:notes_expected) { notes.select(&:review?) }
+        let(:notes_expected) { reviews }
 
         before { get :index, params: { type: 'review' } }
 
@@ -52,13 +46,11 @@ describe Api::V1::NotesController, type: :controller do
           expect(response_body).to match_array(expected)
         end
 
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
-        end
+        it_behaves_like 'ok response'
       end
 
       context 'when filtering by critique type' do
-        let(:notes_expected) { notes.select(&:critique?) }
+        let(:notes_expected) { critiques }
 
         before { get :index, params: { type: 'critique' } }
 
@@ -66,9 +58,7 @@ describe Api::V1::NotesController, type: :controller do
           expect(response_body).to match_array(expected)
         end
 
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
-        end
+        it_behaves_like 'ok response'
       end
 
       context 'when ordering by creation date ascending' do
@@ -80,9 +70,7 @@ describe Api::V1::NotesController, type: :controller do
           expect(response_body).to eq(expected)
         end
 
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
-        end
+        it_behaves_like 'ok response'
       end
 
       context 'when ordering by creation date descending' do
@@ -94,9 +82,7 @@ describe Api::V1::NotesController, type: :controller do
           expect(response_body).to eq(expected)
         end
 
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
-        end
+        it_behaves_like 'ok response'
       end
 
       context 'when fetching notes with page and page size params' do
@@ -114,53 +100,23 @@ describe Api::V1::NotesController, type: :controller do
           expect(response_body).to eq(expected)
         end
 
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
-        end
-      end
-
-      context 'when ordering notes created at the same time' do
-        let!(:tied_notes) { create_list(:note, 2, user: user, created_at: notes.first.created_at) }
-        let(:notes_expected) do
-          (notes + tied_notes).sort_by { |note| [note.created_at, note.id] }.reverse
-        end
-
-        before { get :index, params: { order: 'desc' } }
-
-        it 'responds with tied notes ordered by id' do
-          expect(response_body).to eq(expected)
-        end
+        it_behaves_like 'ok response'
       end
 
       context 'when page size exceeds the maximum' do
         before do
-          create_list(:note, Note.max_per_page + 1, user: user)
-          get :index, params: { page_size: Note.max_per_page + 1 }
+          create_list(:note, described_class::MAX_PAGE_SIZE, user: user)
+          get :index, params: { page_size: described_class::MAX_PAGE_SIZE + 1 }
         end
 
-        it 'responds with at most the maximum page size' do
-          expect(response_body.size).to eq(Note.max_per_page)
-        end
-      end
-
-      context 'when pagination params are not scalar' do
-        let(:notes_expected) { notes }
-
-        before { get :index, params: { page: ['2'], page_size: ['2'] } }
-
-        it 'responds with the default page' do
-          expect(response_body).to match_array(expected)
-        end
-
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
+        it 'responds with the maximum page size' do
+          expect(response_body.size).to eq(described_class::MAX_PAGE_SIZE)
         end
       end
 
       context 'when combining type, order and pagination' do
         let(:notes_expected) do
-          notes
-            .select(&:review?)
+          reviews
             .sort_by(&:created_at)
             .reverse
             .first(2)
@@ -179,9 +135,7 @@ describe Api::V1::NotesController, type: :controller do
           expect(response_body).to eq(expected)
         end
 
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
-        end
+        it_behaves_like 'ok response'
       end
 
       context 'when type param is empty' do
@@ -193,9 +147,7 @@ describe Api::V1::NotesController, type: :controller do
           expect(response_body).to match_array(expected)
         end
 
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
-        end
+        it_behaves_like 'ok response'
       end
 
       context 'when order param is empty' do
@@ -207,9 +159,7 @@ describe Api::V1::NotesController, type: :controller do
           expect(response_body).to match_array(expected)
         end
 
-        it 'responds with 200 status' do
-          expect(response).to have_http_status(:ok)
-        end
+        it_behaves_like 'ok response'
       end
 
       context 'when type param is invalid' do

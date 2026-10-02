@@ -32,6 +32,11 @@
 en:
   hello: "Hello world"
 
+  errors:
+    messages:
+      invalid_note_type: "The note type is invalid"
+      invalid_order: "The order is invalid"
+
   activerecord:
     errors:
       models:

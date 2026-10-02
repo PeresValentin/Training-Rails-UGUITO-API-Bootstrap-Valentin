@@ -8,7 +8,7 @@ module Api
       before_action :validate_create_params, only: :create
 
       def index
-        render json: notes, status: :ok, each_serializer: IndexNoteSerializer
+        render json: notes_filtered, status: :ok, each_serializer: IndexNoteSerializer
       end
 
       def show
@@ -16,7 +16,7 @@ module Api
       end
 
       def create
-        current_user.notes.create!(note_params)
+        notes.create!(note_params)
         render json: { message: I18n.t('notes.created') }, status: :created
       end
 
@@ -24,16 +24,19 @@ module Api
 
       def notes
         current_user.notes
-                    .includes(:utility)
-                    .with_type(params[:type])
-                    .ordered_by_creation(params[:order])
-                    .page(params[:page])
-                    .per(params[:page_size])
-                    .max_paginates_per(MAX_PAGE_SIZE)
+      end
+
+      def notes_filtered
+        notes.includes(:utility)
+             .with_type(params[:type])
+             .ordered_by_creation(params[:order])
+             .page(params[:page])
+             .per(params[:page_size])
+             .max_paginates_per(MAX_PAGE_SIZE)
       end
 
       def show_note
-        current_user.notes.find(params[:id])
+        notes.find(params[:id])
       end
 
       def validate_index_params
@@ -51,9 +54,9 @@ module Api
       end
 
       def note_params
-        note = params.require(:note)
-        note.require(%i[title type content])
-        note.permit(:title, :content).merge(note_type: note[:type])
+        required = { note: { title: true, type: true, content: true } }
+        note = params.permit(require_nested(required, params))[:note]
+        note.except(:type).merge(note_type: note[:type])
       end
 
       def validate_create_params

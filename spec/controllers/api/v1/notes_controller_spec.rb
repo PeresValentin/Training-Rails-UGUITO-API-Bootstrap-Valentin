@@ -2,14 +2,14 @@ require 'rails_helper'
 
 describe Api::V1::NotesController, type: :controller do
   describe 'GET #index' do
-    shared_examples 'responds with the expected notes' do
-      it 'responds with the expected notes' do
+    shared_examples 'responds with the expected notes in any order' do
+      it 'responds with the expected notes in any order' do
         expect(response_body).to match_array(expected)
       end
     end
 
-    shared_examples 'responds with the expected notes in order' do
-      it 'responds with the expected notes in order' do
+    shared_examples 'responds with the expected notes' do
+      it 'responds with the expected notes' do
         expect(response_body).to eq(expected)
       end
     end
@@ -38,7 +38,7 @@ describe Api::V1::NotesController, type: :controller do
 
         before { get :index }
 
-        it_behaves_like 'responds with the expected notes'
+        it_behaves_like 'responds with the expected notes in any order'
 
         it 'does not include notes from other users' do
           expect(response_body.pluck('id')).not_to include(other_user_note.id)
@@ -52,7 +52,7 @@ describe Api::V1::NotesController, type: :controller do
 
         before { get :index, params: { type: 'review' } }
 
-        it_behaves_like 'responds with the expected notes'
+        it_behaves_like 'responds with the expected notes in any order'
 
         it_behaves_like 'ok response'
       end
@@ -62,7 +62,7 @@ describe Api::V1::NotesController, type: :controller do
 
         before { get :index, params: { type: 'critique' } }
 
-        it_behaves_like 'responds with the expected notes'
+        it_behaves_like 'responds with the expected notes in any order'
 
         it_behaves_like 'ok response'
       end
@@ -72,7 +72,7 @@ describe Api::V1::NotesController, type: :controller do
 
         before { get :index, params: { order: 'asc' } }
 
-        it_behaves_like 'responds with the expected notes in order'
+        it_behaves_like 'responds with the expected notes'
 
         it_behaves_like 'ok response'
       end
@@ -82,7 +82,7 @@ describe Api::V1::NotesController, type: :controller do
 
         before { get :index, params: { order: 'desc' } }
 
-        it_behaves_like 'responds with the expected notes in order'
+        it_behaves_like 'responds with the expected notes'
 
         it_behaves_like 'ok response'
       end
@@ -98,7 +98,7 @@ describe Api::V1::NotesController, type: :controller do
           }
         end
 
-        it_behaves_like 'responds with the expected notes in order'
+        it_behaves_like 'responds with the expected notes'
 
         it_behaves_like 'ok response'
       end
@@ -131,7 +131,7 @@ describe Api::V1::NotesController, type: :controller do
           }
         end
 
-        it_behaves_like 'responds with the expected notes in order'
+        it_behaves_like 'responds with the expected notes'
 
         it_behaves_like 'ok response'
       end
@@ -141,7 +141,7 @@ describe Api::V1::NotesController, type: :controller do
 
         before { get :index, params: { type: '' } }
 
-        it_behaves_like 'responds with the expected notes'
+        it_behaves_like 'responds with the expected notes in any order'
 
         it_behaves_like 'ok response'
       end
@@ -151,7 +151,7 @@ describe Api::V1::NotesController, type: :controller do
 
         before { get :index, params: { order: '' } }
 
-        it_behaves_like 'responds with the expected notes'
+        it_behaves_like 'responds with the expected notes in any order'
 
         it_behaves_like 'ok response'
       end

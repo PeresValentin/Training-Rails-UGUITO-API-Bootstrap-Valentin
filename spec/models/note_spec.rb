@@ -118,8 +118,8 @@ RSpec.describe Note, type: :model do
       let(:utility) { create(:north_utility) }
 
       it_behaves_like 'content length by word limits' do
-        let(:short_limit) { 50 }
-        let(:medium_limit) { 100 }
+        let(:short_limit) { utility.short_note_limit }
+        let(:medium_limit) { utility.medium_note_limit }
       end
     end
 
@@ -127,8 +127,8 @@ RSpec.describe Note, type: :model do
       let(:utility) { create(:south_utility) }
 
       it_behaves_like 'content length by word limits' do
-        let(:short_limit) { 60 }
-        let(:medium_limit) { 120 }
+        let(:short_limit) { utility.short_note_limit }
+        let(:medium_limit) { utility.medium_note_limit }
       end
     end
   end
@@ -148,7 +148,7 @@ RSpec.describe Note, type: :model do
       let(:utility) { create(:north_utility) }
 
       it_behaves_like 'review limited to short content' do
-        let(:short_limit) { 50 }
+        let(:short_limit) { utility.short_note_limit }
       end
     end
 
@@ -156,7 +156,7 @@ RSpec.describe Note, type: :model do
       let(:utility) { create(:south_utility) }
 
       it_behaves_like 'review limited to short content' do
-        let(:short_limit) { 60 }
+        let(:short_limit) { utility.short_note_limit }
       end
     end
   end
@@ -170,7 +170,7 @@ RSpec.describe Note, type: :model do
         :note,
         user: user,
         note_type: :critique,
-        content: ('word ' * 101).strip
+        content: ('word ' * (utility.medium_note_limit + 1)).strip
       )
     end
 

@@ -258,8 +258,7 @@ describe Api::V1::NotesController, type: :controller do
     context 'when there is a user logged in' do
       include_context 'with authenticated user'
 
-      let(:short_limit) { user.utility.short_note_limit }
-      let(:long_content) { Faker::Lorem.sentence(word_count: short_limit + 1) }
+      let(:long_content) { Faker::Lorem.sentence(word_count: 200) }
 
       context 'when the params are valid' do
         before { post :create, params: { note: note_params } }
@@ -345,7 +344,7 @@ describe Api::V1::NotesController, type: :controller do
 
       context 'when a review exceeds the word limit' do
         let(:status) { :unprocessable_entity }
-        let(:message) { "Una reseña no puede superar las #{short_limit} palabras." }
+        let(:message) { 'es demasiado largo para una review' }
 
         before do
           post :create, params: { note: note_params.merge(type: 'review', content: long_content) }

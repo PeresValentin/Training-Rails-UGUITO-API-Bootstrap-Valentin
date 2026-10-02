@@ -70,7 +70,7 @@ shared_examples 'review limited to short content' do
     it 'adds an error to content' do
       note.valid?
 
-      expect(note.errors.added?(:content, :review_too_long, limit: short_limit)).to be(true)
+      expect(note.errors.added?(:content, :review_too_long)).to be(true)
     end
   end
 end

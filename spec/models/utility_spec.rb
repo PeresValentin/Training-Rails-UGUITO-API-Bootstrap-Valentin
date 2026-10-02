@@ -9,6 +9,9 @@ RSpec.describe Utility, type: :model do
     it { is_expected.to validate_presence_of(value) }
   end
 
+  it { is_expected.to validate_presence_of(:short_note_limit) }
+  it { is_expected.to validate_presence_of(:medium_note_limit) }
+
   it { is_expected.to have_many(:users).dependent(:destroy) }
 
   it 'has a valid factory' do

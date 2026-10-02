@@ -13,5 +13,7 @@ FactoryBot.define do
     books_data_url do
       'Libros'
     end
+    short_note_limit { 60 }
+    medium_note_limit { 120 }
   end
 end

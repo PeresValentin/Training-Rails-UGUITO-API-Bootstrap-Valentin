@@ -18,7 +18,7 @@ RSpec.describe Utility, type: :model do
   describe '#note_content_length' do
     context 'when the rules are not implemented' do
       it 'raises NotImplementedError' do
-        expect { described_class.new.note_content_length(Note.new) }
+        expect { build(:utility, type: described_class.name).note_content_length(Note.new) }
           .to raise_error(NotImplementedError)
       end
     end

@@ -256,7 +256,7 @@ describe Api::V1::NotesController, type: :controller do
 
       let_it_be(:user) { create(:user) }
 
-      let(:long_content) { Faker::Lorem.sentence(word_count: 200) }
+      let(:long_content) { Faker::Lorem.sentence(word_count: user.utility.short_note_limit + 1) }
 
       context 'when the params are valid' do
         before { post :create, params: { note: note_params } }

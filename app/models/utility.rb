@@ -15,6 +15,8 @@
 #  jsonb                                :jsonb
 #  created_at                           :datetime         not null
 #  updated_at                           :datetime         not null
+#  short_note_limit                     :integer
+#  medium_note_limit                    :integer
 #
 class Utility < ApplicationRecord
   include EntityWithCode
@@ -74,6 +76,7 @@ class Utility < ApplicationRecord
   end
 
   def note_content_length(note)
+    return if short_note_limit.nil? || medium_note_limit.nil?
     return 'short' if short_note?(note)
     return 'medium' if medium_note?(note)
 

@@ -2,15 +2,11 @@ require 'rails_helper'
 
 describe Api::V1::NotesController, type: :controller do
   describe 'GET #index' do
-    let!(:notes) do
-      [
-        create(:note, note_type: :review, created_at: 4.days.ago),
-        create(:note, note_type: :critique, created_at: 3.days.ago),
-        create(:note, note_type: :review, created_at: 2.days.ago),
-        create(:note, note_type: :critique, created_at: 1.day.ago),
-        create(:note, note_type: :review, created_at: Time.current)
-      ]
-    end
+    let_it_be(:user) { create(:user) }
+    let_it_be(:reviews) { create_list(:note, 3, note_type: :review, user: user) }
+    let_it_be(:critiques) { create_list(:note, 2, note_type: :critique, user: user) }
+
+    let(:notes) { reviews + critiques }
 
     let(:expected) do
       JSON.parse(
@@ -30,13 +26,11 @@ describe Api::V1::NotesController, type: :controller do
         expect(response_body).to match_array(expected)
       end
 
-      it 'responds with 200 status' do
-        expect(response).to have_http_status(:ok)
-      end
+      it_behaves_like 'ok response'
     end
 
     context 'when filtering by review type' do
-      let(:notes_expected) { notes.select(&:review?) }
+      let(:notes_expected) { reviews }
 
       before { get :index, params: { type: 'review' } }
 
@@ -44,13 +38,11 @@ describe Api::V1::NotesController, type: :controller do
         expect(response_body).to match_array(expected)
       end
 
-      it 'responds with 200 status' do
-        expect(response).to have_http_status(:ok)
-      end
+      it_behaves_like 'ok response'
     end
 
     context 'when filtering by critique type' do
-      let(:notes_expected) { notes.select(&:critique?) }
+      let(:notes_expected) { critiques }
 
       before { get :index, params: { type: 'critique' } }
 
@@ -58,9 +50,7 @@ describe Api::V1::NotesController, type: :controller do
         expect(response_body).to match_array(expected)
       end
 
-      it 'responds with 200 status' do
-        expect(response).to have_http_status(:ok)
-      end
+      it_behaves_like 'ok response'
     end
 
     context 'when ordering by creation date ascending' do
@@ -72,9 +62,7 @@ describe Api::V1::NotesController, type: :controller do
         expect(response_body).to eq(expected)
       end
 
-      it 'responds with 200 status' do
-        expect(response).to have_http_status(:ok)
-      end
+      it_behaves_like 'ok response'
     end
 
     context 'when ordering by creation date descending' do
@@ -86,9 +74,7 @@ describe Api::V1::NotesController, type: :controller do
         expect(response_body).to eq(expected)
       end
 
-      it 'responds with 200 status' do
-        expect(response).to have_http_status(:ok)
-      end
+      it_behaves_like 'ok response'
     end
 
     context 'when fetching notes with page and page size params' do
@@ -106,14 +92,12 @@ describe Api::V1::NotesController, type: :controller do
         expect(response_body).to eq(expected)
       end
 
-      it 'responds with 200 status' do
-        expect(response).to have_http_status(:ok)
-      end
+      it_behaves_like 'ok response'
     end
 
     context 'when page size exceeds the maximum' do
       before do
-        create_list(:note, described_class::MAX_PAGE_SIZE, user: notes.first.user)
+        create_list(:note, described_class::MAX_PAGE_SIZE, user: user)
         get :index, params: { page_size: described_class::MAX_PAGE_SIZE + 1 }
       end
 
@@ -124,8 +108,7 @@ describe Api::V1::NotesController, type: :controller do
 
     context 'when combining type, order and pagination' do
       let(:notes_expected) do
-        notes
-          .select(&:review?)
+        reviews
           .sort_by(&:created_at)
           .reverse
           .first(2)
@@ -144,9 +127,7 @@ describe Api::V1::NotesController, type: :controller do
         expect(response_body).to eq(expected)
       end
 
-      it 'responds with 200 status' do
-        expect(response).to have_http_status(:ok)
-      end
+      it_behaves_like 'ok response'
     end
 
     context 'when type param is empty' do
@@ -158,9 +139,7 @@ describe Api::V1::NotesController, type: :controller do
         expect(response_body).to match_array(expected)
       end
 
-      it 'responds with 200 status' do
-        expect(response).to have_http_status(:ok)
-      end
+      it_behaves_like 'ok response'
     end
 
     context 'when order param is empty' do
@@ -172,9 +151,7 @@ describe Api::V1::NotesController, type: :controller do
         expect(response_body).to match_array(expected)
       end
 
-      it 'responds with 200 status' do
-        expect(response).to have_http_status(:ok)
-      end
+      it_behaves_like 'ok response'
     end
 
     context 'when type param is invalid' do
@@ -195,9 +172,8 @@ describe Api::V1::NotesController, type: :controller do
   end
 
   describe 'GET #show' do
-    let!(:note) { create(:note) }
-
     context 'when the note exists' do
+      let_it_be(:note) { create(:note) }
       let(:record) { note }
       let(:expected) do
         ShowNoteSerializer.new(note).to_json

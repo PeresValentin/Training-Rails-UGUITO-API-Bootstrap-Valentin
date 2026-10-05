@@ -5,6 +5,10 @@ module UtilityService
         { books: map_books(response_body['libros']) }
       end
 
+      def retrieve_notes(_response_code, response_body)
+        { notes: map_notes(response_body['notas']) }
+      end
+
       private
 
       def map_books(books)
@@ -19,6 +23,33 @@ module UtilityService
             year: book['año']
           }
         end
+      end
+
+      def map_notes(notes)
+        notes.map do |note|
+          {
+            title: note['titulo'],
+            type: note['tipo'] == 'resenia' ? 'review' : 'critique',
+            created_at: note['fecha_creacion'],
+            content: note['contenido'],
+            user: {
+              email: note['autor']['datos_de_contacto']['email'],
+              first_name: note['autor']['datos_personales']['nombre'],
+              last_name: note['autor']['datos_personales']['apellido']
+            },
+            book: map_note_book(note['libro'])
+          }
+        end
+      end
+
+      def map_note_book(book)
+        return if book.nil?
+
+        {
+          title: book['titulo'],
+          author: book['autor'],
+          genre: book['genero']
+        }
       end
     end
   end

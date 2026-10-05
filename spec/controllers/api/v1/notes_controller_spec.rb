@@ -367,31 +367,15 @@ describe Api::V1::NotesController, type: :controller do
     context 'when there is a user logged in' do
       include_context 'with authenticated user'
 
+      let_it_be(:user) { create(:user) }
+
       let(:params) { { author: Faker::Book.author } }
       let(:worker_name) { 'RetrieveNotesWorker' }
       let(:parameters) { [user.id, params] }
 
       before { get :index_async, params: params }
 
-      it 'returns status code accepted' do
-        expect(response).to have_http_status(:accepted)
-      end
-
-      it 'returns the response id and url to retrive the data later' do
-        expect(response_body.keys).to contain_exactly('response', 'job_id', 'url')
-      end
-
-      it 'enqueues a job' do
-        expect(AsyncRequest::JobProcessor.jobs.size).to eq(1)
-      end
-
-      it 'creates the right job' do
-        expect(AsyncRequest::Job.last.worker).to eq(worker_name)
-      end
-
-      it 'creates a job with given parameters' do
-        expect(AsyncRequest::Job.last.params).to eq(parameters)
-      end
+      it_behaves_like 'basic endpoint with polling'
     end
 
     context 'when there is not a user logged in' do

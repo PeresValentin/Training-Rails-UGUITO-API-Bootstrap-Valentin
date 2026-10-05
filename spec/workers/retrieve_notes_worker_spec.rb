@@ -10,7 +10,6 @@ describe RetrieveNotesWorker do
 
     let(:author) { 'J.K.Rowling' }
     let(:params) { { author: author } }
-    let(:user) { create(:user, utility: utility) }
 
     let(:expected_notes_keys) do
       %i[title type created_at content user book]
@@ -20,6 +19,7 @@ describe RetrieveNotesWorker do
       context "with #{utility_factory}" do
         include_context 'with utility' do
           let_it_be(:utility) { create(utility_factory) }
+          let_it_be(:user) { create(:user, utility: utility) }
         end
 
         context 'when the request to the utility succeeds' do

@@ -26,10 +26,16 @@ describe UtilityService::South::ResponseMapper do
       }
     end
 
-    it 'maps the note title, creation date and content' do
-      expect(mapped_note.slice(:title, :created_at, :content)).to eq(
-        title: note['TituloNota'], created_at: note['FechaCreacionNota'], content: note['Contenido']
-      )
+    it 'maps the title' do
+      expect(mapped_note[:title]).to eq(note['TituloNota'])
+    end
+
+    it 'maps the creation date' do
+      expect(mapped_note[:created_at]).to eq(note['FechaCreacionNota'])
+    end
+
+    it 'maps the content' do
+      expect(mapped_note[:content]).to eq(note['Contenido'])
     end
 
     it 'maps the author as the user, with the last name first in the full name' do

@@ -118,8 +118,8 @@ RSpec.describe Note, type: :model do
       let(:utility) { create(:north_utility) }
 
       it_behaves_like 'content length by word limits' do
-        let(:short_limit) { 50 }
-        let(:medium_limit) { 100 }
+        let(:short_limit) { utility.short_note_limit }
+        let(:medium_limit) { utility.medium_note_limit }
       end
     end
 
@@ -127,8 +127,26 @@ RSpec.describe Note, type: :model do
       let(:utility) { create(:south_utility) }
 
       it_behaves_like 'content length by word limits' do
-        let(:short_limit) { 60 }
-        let(:medium_limit) { 120 }
+        let(:short_limit) { utility.short_note_limit }
+        let(:medium_limit) { utility.medium_note_limit }
+      end
+    end
+
+    context 'when utility has no short note limit' do
+      let(:utility) { create(:utility, short_note_limit: nil) }
+      let(:note) { build(:note, user: user) }
+
+      it 'returns nil' do
+        expect(note.content_length).to be_nil
+      end
+    end
+
+    context 'when utility has no medium note limit' do
+      let(:utility) { create(:utility, medium_note_limit: nil) }
+      let(:note) { build(:note, user: user) }
+
+      it 'returns nil' do
+        expect(note.content_length).to be_nil
       end
     end
   end
@@ -148,7 +166,7 @@ RSpec.describe Note, type: :model do
       let(:utility) { create(:north_utility) }
 
       it_behaves_like 'review limited to short content' do
-        let(:short_limit) { 50 }
+        let(:short_limit) { utility.short_note_limit }
       end
     end
 
@@ -156,7 +174,16 @@ RSpec.describe Note, type: :model do
       let(:utility) { create(:south_utility) }
 
       it_behaves_like 'review limited to short content' do
-        let(:short_limit) { 60 }
+        let(:short_limit) { utility.short_note_limit }
+      end
+    end
+
+    context 'when utility has no note length limits' do
+      let(:utility) { create(:utility, short_note_limit: nil, medium_note_limit: nil) }
+      let(:note) { build(:note, user: user, note_type: :review) }
+
+      it 'is valid' do
+        expect(note).to be_valid
       end
     end
   end
@@ -170,7 +197,7 @@ RSpec.describe Note, type: :model do
         :note,
         user: user,
         note_type: :critique,
-        content: ('word ' * 101).strip
+        content: ('word ' * (utility.medium_note_limit + 1)).strip
       )
     end
 

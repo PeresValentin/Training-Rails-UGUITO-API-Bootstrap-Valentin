@@ -61,6 +61,15 @@ end
 #                                    PATCH      /admin/admin_users/:id(.:format)                                                                  admin/admin_users#update
 #                                    PUT        /admin/admin_users/:id(.:format)                                                                  admin/admin_users#update
 #                                    DELETE     /admin/admin_users/:id(.:format)                                                                  admin/admin_users#destroy
+#           batch_action_admin_books POST       /admin/books/batch_action(.:format)                                                               admin/books#batch_action
+#                        admin_books GET        /admin/books(.:format)                                                                            admin/books#index
+#                                    POST       /admin/books(.:format)                                                                            admin/books#create
+#                     new_admin_book GET        /admin/books/new(.:format)                                                                        admin/books#new
+#                    edit_admin_book GET        /admin/books/:id/edit(.:format)                                                                   admin/books#edit
+#                         admin_book GET        /admin/books/:id(.:format)                                                                        admin/books#show
+#                                    PATCH      /admin/books/:id(.:format)                                                                        admin/books#update
+#                                    PUT        /admin/books/:id(.:format)                                                                        admin/books#update
+#                                    DELETE     /admin/books/:id(.:format)                                                                        admin/books#destroy
 #                    admin_dashboard GET        /admin/dashboard(.:format)                                                                        admin/dashboard#index
 #           copy_admin_north_utility GET        /admin/north_utilities/:id/copy(.:format)                                                         admin/north_utilities#copy
 # batch_action_admin_north_utilities POST       /admin/north_utilities/batch_action(.:format)                                                     admin/north_utilities#batch_action
@@ -104,6 +113,9 @@ end
 #                 async_api_v1_books GET        /api/v1/books/async(.:format)                                                                     api/v1/books#index_async {:format=>:json}
 #                       api_v1_books GET        /api/v1/books(.:format)                                                                           api/v1/books#index {:format=>:json}
 #                        api_v1_book GET        /api/v1/books/:id(.:format)                                                                       api/v1/books#show {:format=>:json}
+#                       api_v1_notes GET        /api/v1/notes(.:format)                                                                           api/v1/notes#index {:format=>:json}
+#                                    POST       /api/v1/notes(.:format)                                                                           api/v1/notes#create {:format=>:json}
+#                        api_v1_note GET        /api/v1/notes/:id(.:format)                                                                       api/v1/notes#show {:format=>:json}
 #               current_api_v1_users GET        /api/v1/users/current(.:format)                                                                   api/v1/users#current {:format=>:json}
 #                       api_v1_users GET        /api/v1/users(.:format)                                                                           api/v1/users#show {:format=>:json}
 #                                    PATCH      /api/v1/users(.:format)                                                                           api/v1/users#update {:format=>:json}

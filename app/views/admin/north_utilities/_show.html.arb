@@ -22,5 +22,11 @@ panel 'Utility' do
     row :books_data_url do
       utility.books_data_url
     end
+    row :short_note_limit do
+      utility.short_note_limit
+    end
+    row :medium_note_limit do
+      utility.medium_note_limit
+    end
   end
 end

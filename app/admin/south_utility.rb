@@ -7,6 +7,7 @@ ActiveAdmin.register SouthUtility do
   permit_params = %i[
     name code base_url external_api_key external_api_secret
     external_api_authentication_url books_data_url
+    short_note_limit medium_note_limit
   ]
 
   member_action :copy, method: :get do
@@ -47,6 +48,8 @@ ActiveAdmin.register SouthUtility do
       f.input :external_api_secret
       f.input :external_api_authentication_url, as: :url
       f.input :books_data_url, as: :url
+      f.input :short_note_limit
+      f.input :medium_note_limit
       f.actions
     end
   end

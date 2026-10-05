@@ -32,7 +32,7 @@ class Note < ApplicationRecord
   def review_content_must_be_short
     return unless review?
     return if utility.blank?
-    return if content_length == 'short'
+    return if content_length.nil? || content_length == 'short'
 
     errors.add(:content, :review_too_long)
   end

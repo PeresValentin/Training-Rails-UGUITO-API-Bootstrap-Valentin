@@ -1,5 +1,5 @@
 require 'rails_helper'
-#.
+
 shared_examples 'content length by word limits' do
   let(:note) do
     build(

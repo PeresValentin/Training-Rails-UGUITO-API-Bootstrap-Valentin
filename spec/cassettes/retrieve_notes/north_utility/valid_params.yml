@@ -1,0 +1,89 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://private-bfc6a-widergytrainingnorthutilityapi.apiary-mock.com/notas?autor=J.K.Rowling
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '3150'
+      X-Apiary-Ratelimit-Limit:
+      - '120'
+      X-Apiary-Ratelimit-Remaining:
+      - '118'
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - OPTIONS,GET,HEAD,POST,PUT,DELETE,TRACE,CONNECT
+      Access-Control-Expose-Headers:
+      - Content-Type
+      Access-Control-Max-Age:
+      - '10'
+      X-Apiary-Transaction-Id:
+      - 6ac3c1008447ec008a344b36
+      Date:
+      - Mon, 05 Oct 2026 15:23:44 GMT
+      Connection:
+      - keep-alive
+      Akamai-Grn:
+      - 0.4f1d1202.1791213823.12fefd5d
+    body:
+      encoding: UTF-8
+      string: "{\n    \"notas\": [\n        {\n            \"id\": 1,\n            \"titulo\":
+        \"Opinion personal\",\n            \"tipo\": \"opinion\",\n            \"contenido\":
+        \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum commodo
+        nulla at eros sollicitudin, vel feugiat nibh malesuada. Fusce vel ante vel
+        dolor convallis ultrices.\",\n            \"fecha_creacion\": \"2022-05-20T14:20:55-03:00\",\n
+        \           \"autor\": {\n                \"datos_de_contacto\": {\n                    \"email\":
+        \"albertogomez@north.com\",\n                    \"telefono\": \"11-2233-4455\"\n
+        \               },\n                \"datos_personales\": {\n                    \"nro_documento\":
+        \"12345678\",\n                    \"nombre\": \"Alberto\",\n                    \"apellido\":
+        \"Gomez\"\n                }\n            },\n            \"libro\": {\n                \"id\":
+        1,\n                \"titulo\": \"Harry Potter y la piedra filosofal\",\n
+        \               \"fecha_creacion\": \"2022-05-20T14:20:55-03:00\",\n                \"autor\":
+        \"J.K.Rowling\",\n                \"genero\": \"fantasia\",\n                \"imagen_url\":
+        \"https://some_url.com\",\n                \"editorial\": \"Nice Books\",\n
+        \               \"año\": \"1997\"\n            }\n        },\n        {\n
+        \           \"id\": 2,\n            \"titulo\": \"Reseña\",\n            \"contenido\":
+        \"Lorem impsun dolor consectetur bla.\",\n            \"tipo\": \"resenia\",\n
+        \           \"fecha_creacion\": \"2022-05-20T14:20:55-03:00\",\n            \"autor\":
+        {\n                \"datos_de_contacto\": {\n                    \"email\":
+        \"helenamartinez@north.com\",\n                    \"telefono\": \"11-2233-4455\"\n
+        \               },\n                \"datos_personales\": {\n                    \"nro_documento\":
+        \"12345689\",\n                    \"nombre\": \"Helena\",\n                    \"apellido\":
+        \"Martinez\"\n                }\n            },\n            \"libro\": {\n
+        \               \"id\": 2,\n                \"titulo\": \"Harry Potter y la
+        cámara secreta\",\n                \"autor\": \"J.K.Rowling\",\n                \"genero\":
+        \"fantasia\",\n                \"imagen_url\": \"https://some_url.com\",\n
+        \               \"editorial\": \"Nice Books\",\n                \"año\": \"1998\"\n
+        \           }\n        },\n        {\n            \"id\": 3,\n            \"titulo\":
+        \"Critica\",\n            \"tipo\": \"critica\",\n            \"contenido\":
+        \"Lorem ipsum dolor sit amet, consectetur adipiscing . Fusce vel ante vel
+        dolor convallis ultrices.\", \n            \"fecha_creacion\": \"2022-05-20T14:20:55-03:00\",\n
+        \           \"autor\": {\n                \"datos_de_contacto\": {\n                    \"email\":
+        \"matiaslomonaco@north.com\",\n                    \"telefono\": \"11-2233-4455\"\n
+        \               },\n                \"datos_personales\": {\n                    \"nro_documento\":
+        \"12345695\",\n                    \"nombre\": \"Matias\",\n                    \"apellido\":
+        \"Lomonaco\"\n                }\n            },\n            \"libro\": {\n
+        \               \"id\": 3,\n                \"titulo\": \"Animales fantásticos
+        y dónde encontrarlos\",\n                \"autor\": \"J.K.Rowling\",\n                \"genero\":
+        \"fantasia\",\n                \"imagen_url\": \"https://some_url.com\",\n
+        \               \"editorial\": \"Nice Books\",\n                \"año\": \"2001\"\n
+        \           }\n        }\n    ]\n}"
+  recorded_at: Mon, 05 Oct 2026 15:23:44 GMT
+recorded_with: VCR 6.2.0

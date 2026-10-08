@@ -20,6 +20,11 @@ module Api
         render json: { message: I18n.t('notes.created') }, status: :created
       end
 
+      def index_async
+        job_id = execute_async(RetrieveNotesWorker, current_user.id, index_async_params)
+        async_custom_response(job_id)
+      end
+
       private
 
       def notes
@@ -63,6 +68,10 @@ module Api
         return if Note.note_types.key?(note_params[:note_type])
 
         render_simple_error(I18n.t('errors.messages.invalid_note_type'), :unprocessable_entity)
+      end
+
+      def index_async_params
+        { author: params.require(:author) }
       end
     end
   end

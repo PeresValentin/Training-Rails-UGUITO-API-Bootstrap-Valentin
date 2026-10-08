@@ -18,7 +18,11 @@ Rails.application.routes.draw do
         get :async, to: 'books#index_async'
       end
     end
-    resources :notes, only: %i[index show create]
+    resources :notes, only: %i[index show create] do
+      collection do
+        get :async, to: 'notes#index_async'
+      end
+    end
     resource :users do
       get :current
     end
